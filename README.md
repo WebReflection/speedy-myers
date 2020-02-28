@@ -70,4 +70,83 @@ for (let i = 0, {length} = changes; i < length; i++) {
 console.assert(source.join(',') === target.join(','));
 ```
 
+#### A DOM Based Example
+
+As this module is general purpose, it is possible to use it to update a tree in the DOM too.
+
+[uhtml](https://github.com/WebReflection/uhtml#readme), [lighterhtml](https://github.com/WebReflection/lighterhtml#readme), and [hyperHTML](https://github.com/WebReflection/hyperHTML#readme) use a very similar strategy through [udomdiff](https://github.com/WebReflection/udomdiff#readme) and [domdiff](https://github.com/WebReflection/domdiff#readme).
+
+```js
+const {NOOP, REPLACE, INSERT, DELETE, diff} = Myers;
+const parentNode = document.body;
+const source = [].slice.call(document.body.childNodes);
+const target = source.append(document.createElement('myers'));
+const changes = diff(source, target);
+let sourceIndex = 0;
+let targetIndex = 0;
+const comments = new Map;
+for (let i = 0, {length} = changes; i < length; i++) {
+  switch (changes[i]) {
+
+    case REPLACE:
+      // as a node cannot exists simultaneously in two parts of the tree
+      // we cannot append directly the target[targetIndex] unless
+      // its parentNode is different, or non-existent
+      if (target[targetIndex].parentNode !== parentNode)
+        parentNode.replaceChild(
+          target[targetIndex],
+          source[sourceIndex]
+        );
+      // otherwise we need to use a placeholder to keep the position
+      // and replace it only once all operations are completed
+      else {
+        const comment = document.createComment('');
+        comments.set(comment, target[targetIndex]);
+        parentNode.replaceChild(comment, source[sourceIndex]);
+      }
+    // remember to move forward both indexes, with NOOP and REPLACE
+    case NOOP:
+      sourceIndex++;
+      targetIndex++;
+      break;
+
+    case DELETE:
+      // it is always safe to remove a live node from its deleted position
+      parentNode.removeChild(source[sourceIndex]);
+      // remember in this case to move the sourceIndex forward
+      sourceIndex++;
+      break;
+
+    case INSERT:
+      // similarly with the REPLACE case, we cannot insert the target node
+      // right away, unless its parent is different
+      if (target[targetIndex].parentNode !== parentNode)
+        // INSERT can happen outside the source boundaries
+        // however, `null` or `undefined`, with insertBefore
+        // means `appendChild`, so since this is a root container
+        // it is OK to just use insertBefore
+        parentNode.insertBefore(
+          target[targetIndex],
+          source[sourceIndex]
+        );
+      // use the same comment strategy
+      else {
+        const comment = document.createComment('');
+        comments.set(comment, target[targetIndex]);
+        parentNode.insertBefore(comment, source[sourceIndex]);
+      }
+      // always move forward targetIndex++; on INSERT
+      targetIndex++;
+      break;
+  }
+}
+
+// once the loop is completed, we can replace all placeholders
+comments.forEach((node, comment) => {
+  parentNode.replaceChild(node, comment);
+});
+```
+
+### Compatibility
+
 This module is compatible with IE11 and every other Mobile or Desktop engine that supports `Int8Array`.
