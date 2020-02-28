@@ -150,3 +150,9 @@ comments.forEach((node, comment) => {
 ### Compatibility
 
 This module is compatible with IE11 and every other Mobile or Desktop engine that supports `Int8Array`.
+
+## P.S.
+
+This algorithm was created to solve text diffing. If applied to not so common, but widely possible, Web/UI cases, this algorithm easily perform pretty badly.
+
+Some [explanation and benchmark screenshots in twitter](https://twitter.com/WebReflection/status/1233472356544368641).
