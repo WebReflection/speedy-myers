@@ -4,15 +4,21 @@
   "description": "A Speedy E.Meyers's O(ND) Based Diffing Algorithm",
   "main": "cjs/index.js",
   "scripts": {
-    "build": "npm run cjs && npm run rollup:new && npm run rollup:babel && npm run min && npm run test",
+    "build": "npm run cjs && npm run rollup:new && npm run rollup:babel && npm run min && npm run test && npm run size",
     "cjs": "ascjs esm cjs",
     "rollup:new": "rollup --config rollup/new.config.js",
     "rollup:babel": "rollup --config rollup/babel.config.js",
     "min": "uglifyjs index.js --support-ie8 --comments=/^!/ -c -m -o min.js",
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
-    "test": "nyc node test/index.js"
+    "test": "nyc node test/index.js",
+    "size": "cat min.js | brotli | wc -c && cat new.js | brotli | wc -c"
   },
-  "keywords": ["Meyers", "diffing", "algorithm", "objects"],
+  "keywords": [
+    "Meyers",
+    "diffing",
+    "algorithm",
+    "objects"
+  ],
   "author": "Andrea Giammarchi",
   "license": "ISC",
   "devDependencies": {
@@ -28,5 +34,13 @@
     "uglify-js": "^3.8.0"
   },
   "module": "esm/index.js",
-  "unpkg": "min.js"
+  "unpkg": "min.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WebReflection/speedy-myers.git"
+  },
+  "bugs": {
+    "url": "https://github.com/WebReflection/speedy-myers/issues"
+  },
+  "homepage": "https://github.com/WebReflection/speedy-myers#readme"
 }
