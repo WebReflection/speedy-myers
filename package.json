@@ -1,6 +1,6 @@
 {
   "name": "speedy-myers",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A Speedy E.Meyers's O(ND) Based Diffing Algorithm",
   "main": "cjs/index.js",
   "scripts": {
